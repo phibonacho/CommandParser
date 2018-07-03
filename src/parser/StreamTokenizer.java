@@ -35,7 +35,7 @@ public class StreamTokenizer implements Tokenizer {
         keywords.put("add", ADD);
         keywords.put("list", LIST);
         keywords.put("message", OBJ);
-        keywords.put("topics", OBJ);
+        keywords.put("topic", OBJ);
         keywords.put("user", OBJ);
         keywords.put("on", ON);
         keywords.put("connect", CONNECT);

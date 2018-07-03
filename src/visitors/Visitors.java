@@ -1,5 +1,6 @@
 package visitors;
 
+import parser.TokenType;
 import parser.ast.*;
 
 public interface Visitors<T> {
@@ -10,7 +11,7 @@ public interface Visitors<T> {
     T visitAddTopic(Exp t);
 
     T visitListTopics();
-    T visitListObj(Ident t, ObjectLiteral o);
+    T visitListObj(TokenType t, Ident o);
 
     T visitSub();
     T visitConnect();

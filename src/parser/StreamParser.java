@@ -66,45 +66,38 @@ public class StreamParser implements Parser {
         }
     }
 
+    // list user: restituisce gli utenti connessi su lato server
+    // list user on <Ident>: restituisce gli utenti registrati al topic
+    // list message on <Ident>: restituisce i messaggi postati su un topic
+    // list topic: restituisce i topic presenti su un server
     private ListStmt parseListStmt() throws ParserException {
         consume(LIST);
-        if(tokenizer.tokenType() == MESSAGE){
-            ObjectLiteral obj = new ObjectLiteral(tokenizer.tokenString());
-            consume(MESSAGE);
-            return new ListStmt(parseIdent(), obj); //TODO: capire come fare
-        }
-        if(tokenizer.tokenType() == USER){
-            ObjectLiteral obj = new ObjectLiteral(tokenizer.tokenString());
-            return new ListStmt(parseIdent(), obj);
-        }
-        return null;
+        TokenType found = tokenizer.tokenType();
+        consume(OBJ);
+        return new ListStmt(found, parseOn());
     }
 
     AddStmt parseAddStmt() throws ParserException{
         consume(ADD);
-        switch (tokenizer.tokenType()){
+        Message msg = null;
+        TokenType found = tokenizer.tokenType();
+        consume(OBJ);
+        switch (found){
             default:
                 unexpectedTokenError();
             case MESSAGE:
-                Message msg = parseMessage();
+                msg = parseMessage();
                 consume(ON);
-                Ident topic = parseIdent();
-                return new AddStmt(msg, topic);
             case TOPIC:
                 Ident t = parseIdent();
-                return new AddStmt(null, t);
+                return new AddStmt(msg, t);
         }
     }
 
-
-    private Exp parseAtom() throws ParserException{
-        switch (tokenizer.tokenType()){
-            default:
-                unexpectedTokenError();
-            case MESSAGE:
-                return parseMessage();
-
-        }
+    private Ident parseOn() throws ParserException {
+        if (tokenizer.tokenType()!= ON) return null;
+        consume(ON);
+        return parseIdent();
     }
 
     private Connect parseConnectStmt() throws ParserException {
