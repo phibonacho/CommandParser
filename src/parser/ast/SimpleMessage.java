@@ -12,11 +12,6 @@ public class SimpleMessage implements Message {
 	}
 
 	@Override
-	public String getMessage() {
-		return message;
-	}
-
-	@Override
 	public final boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -38,5 +33,10 @@ public class SimpleMessage implements Message {
 	@Override
 	public <T> T accept(Visitors<T> visitor) {
 		return visitor.visitAddMessage(message); // left for uniformity, instead of return visitor.visitIdent(this);
+	}
+
+	@Override
+	public String getMessage() {
+		return message;
 	}
 }

@@ -26,4 +26,6 @@ public interface Visitors<T> {
     T visitStmt(Stmt single);
 
     T visitAddMessage(String message);
+
+    T visitConcat(Exp left, Exp right);
 }

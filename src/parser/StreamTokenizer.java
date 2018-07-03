@@ -9,6 +9,7 @@ import static parser.TokenType.*;
 public class StreamTokenizer implements Tokenizer {
     private static final String regEx;
     private static final Map<String, TokenType> keywords = new HashMap<>();
+    private static final Map<String, TokenType> symbols = new HashMap<>();
 
     private boolean hasNext = true; // any stream contains at least the EOF
     // token
@@ -22,24 +23,28 @@ public class StreamTokenizer implements Tokenizer {
     static {
         // remark: groups must correspond to the ordinal of the corresponding
         // token type
-        final String identRegEx = "([a-zA-Z][a-zA-Z0-9]*)"; // group 1
+        final String stringRegEx = "(\"[^\"\\n]*\")";
+        final String identRegEx = "([a-zA-Z][a-zA-Z0-9,\\./]*)"; // group 1
         final String numRegEx = "(0[bB][01]+|[1-9][0-9]*|0)"; // group 2
-        final String skipRegEx = "(\\s+|//.*)"; // group 3
+        final String skipRegEx = "(\\s+|\\.*)"; // group 3
         final String IPRegex = "(([0-9]+.){3}[0-9])"; // group 4
-        final String MessageRegEx = "\"[^\"]*\""; // group 5
-        // final String symbolRegEx = "\\+|\\*|!|==|=|&&|\\(|\\)|;|,|\\{|\\}|-|::|:|\\[|\\]";
-        regEx = identRegEx + "|" + numRegEx  + "|" + skipRegEx + "|" + IPRegex + "|" + MessageRegEx;
+        final String symbolRegEx = "\"|\\+|\\*|!|==|=|&&|\\(|\\)|;|,|\\{|\\}|-|::|:|\\[|\\]";
+        regEx = stringRegEx + "|" + identRegEx + "|" + numRegEx  + "|" + skipRegEx + "|" + IPRegex + "|" + symbolRegEx;
     }
 
     static {
         keywords.put("add", ADD);
         keywords.put("list", LIST);
-        keywords.put("message", OBJ);
-        keywords.put("topic", OBJ);
-        keywords.put("user", OBJ);
+        keywords.put("message", MESSAGE);
+        keywords.put("topic", TOPIC);
+        keywords.put("user", USER);
         keywords.put("on", ON);
         keywords.put("connect", CONNECT);
         keywords.put("disconnect", DISCONNECT);
+    }
+
+    static {
+        symbols.put("\"", APEX);
     }
 
     /**
@@ -57,6 +62,13 @@ public class StreamTokenizer implements Tokenizer {
      */
     private void checkType() {
         tokenString = scanner.group();
+
+        if(scanner.group(MESSAGELIT.ordinal()) != null){
+            System.err.println("Found a string...");
+            tokenType = MESSAGELIT;
+            MessageValue = tokenString.substring(1, tokenString.length()-1);
+            return;
+        }
 
         if (scanner.group(IDENT.ordinal()) != null) { // IDENT or a keyword
             tokenType = keywords.get(tokenString);
@@ -152,7 +164,7 @@ public class StreamTokenizer implements Tokenizer {
     @Override
     public String MessageValue(){
         checkType();
-        return MessageValue.substring(1, MessageValue.length()); // rimuove le virgolette...
+        return MessageValue; // rimuove le virgolette...
     }
 
 }

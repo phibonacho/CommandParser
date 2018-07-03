@@ -2,6 +2,10 @@ package parser;
 
 import parser.ast.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+
 import static parser.TokenType.*;
 
 public class StreamParser implements Parser {
@@ -73,24 +77,23 @@ public class StreamParser implements Parser {
     private ListStmt parseListStmt() throws ParserException {
         consume(LIST);
         TokenType found = tokenizer.tokenType();
-        consume(OBJ);
+        consume(found);
         return new ListStmt(found, parseOn());
     }
 
-    AddStmt parseAddStmt() throws ParserException{
-        consume(ADD);
+    private AddStmt parseAddStmt() throws ParserException{
         Message msg = null;
-        TokenType found = tokenizer.tokenType();
-        consume(OBJ);
-        switch (found){
+        consume(ADD);
+        switch (tokenizer.tokenType()){
             default:
                 unexpectedTokenError();
             case MESSAGE:
+                tryNext();
                 msg = parseMessage();
+                System.err.println(msg.toString());
                 consume(ON);
             case TOPIC:
-                Ident t = parseIdent();
-                return new AddStmt(msg, t);
+                return new AddStmt(msg, parseIdent());
         }
     }
 
@@ -113,12 +116,29 @@ public class StreamParser implements Parser {
 
     private Message parseMessage() throws ParserException {
         String message = tokenizer.MessageValue();
-        consume(MESSAGE);
-        //TODO: capire come spostarsi oltre la stringa che contiene il messaggio....
+        consume(MESSAGELIT);
         return new SimpleMessage(message);
     }
 
     private Ident parseIdent() throws ParserException{
-        return new SimpleIdent(tokenizer.tokenString());
+        String name = tokenizer.tokenString();
+        consume(IDENT);
+        return new SimpleIdent(name);
+    }
+
+    public static void main(String args[]){
+        try (Tokenizer tokenizer = new StreamTokenizer(
+                args.length > 0 ? new FileReader(args[0]) : new InputStreamReader(System.in))) {
+            Parser parser = new StreamParser(tokenizer);
+            System.out.println("sono qui");
+            Prog prog = parser.parseProg();
+        }
+        catch(ParserException pe){
+            System.err.println("Syntax error: "+ pe.getMessage());
+        } catch (TokenizerException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
