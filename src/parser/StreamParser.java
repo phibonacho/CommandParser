@@ -67,6 +67,10 @@ public class StreamParser implements Parser {
                 return parseConnectStmt();
             case DISCONNECT:
                 return parseDisconnectStmt();
+            case SUBSCRIBE:
+                return parseSubscribe();
+            case UNSUBSCRIBE:
+                return parseUnsubscribe();
             case HELP:
                 return parseHelpStmt();
         }
@@ -93,16 +97,20 @@ public class StreamParser implements Parser {
                 tryNext();
                 msg = parseMessage();
                 System.err.println(msg.toString());
-                consume(ON);
+                consume(IN);
             case TOPIC:
                 return new AddStmt(msg, parseIdent());
         }
     }
 
-    private Ident parseOn() throws ParserException {
-        if (tokenizer.tokenType()!= ON) return null;
-        consume(ON);
-        return parseIdent();
+    private Subscribe parseSubscribe() throws ParserException {
+        consume(SUBSCRIBE);
+        return new Subscribe(parseIdent());
+    }
+
+    private Unsubscribe parseUnsubscribe() throws ParserException {
+        consume(UNSUBSCRIBE);
+        return new Unsubscribe(parseIdent());
     }
 
     private Connect parseConnectStmt() throws ParserException {
@@ -132,6 +140,12 @@ public class StreamParser implements Parser {
         String name = tokenizer.tokenString();
         consume(IDENT);
         return new SimpleIdent(name);
+    }
+
+    private Ident parseOn() throws ParserException {
+        if (tokenizer.tokenType()!= IN) return null;
+        consume(IN);
+        return parseIdent();
     }
 
     public static void main(String args[]){

@@ -9,13 +9,11 @@ import static parser.TokenType.*;
 public class StreamTokenizer implements Tokenizer {
     private static final String regEx;
     private static final Map<String, TokenType> keywords = new HashMap<>();
-    private static final Map<String, TokenType> symbols = new HashMap<>();
 
     private boolean hasNext = true; // any stream contains at least the EOF
     // token
     private TokenType tokenType;
     private String tokenString;
-    private int intValue;
     private String IPValue;
     private String MessageValue;
     private final Scanner scanner;
@@ -36,14 +34,13 @@ public class StreamTokenizer implements Tokenizer {
         keywords.put("message", MESSAGE);
         keywords.put("topic", TOPIC);
         keywords.put("user", USER);
-        keywords.put("on", ON);
+        keywords.put("in", IN);
         keywords.put("connect", CONNECT);
         keywords.put("disconnect", DISCONNECT);
         keywords.put("help", HELP);
-    }
-
-    static {
-        symbols.put("\"", APEX);
+        keywords.put("subscribe", SUBSCRIBE);
+        keywords.put("unsubscribe", UNSUBSCRIBE);
+        keywords.put("remove", REMOVE);
     }
 
     /**
@@ -124,12 +121,6 @@ public class StreamTokenizer implements Tokenizer {
     public String tokenString() {
         checkValidToken();
         return tokenString;
-    }
-
-    @Override
-    public int intValue() {
-        checkValidToken(NUM);
-        return intValue;
     }
 
     @Override

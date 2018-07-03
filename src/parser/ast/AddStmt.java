@@ -15,11 +15,11 @@ public class AddStmt implements Stmt{
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + (messageExp == null?  "(" + TopicExp + ")" : "(" + messageExp + "," + TopicExp + ")");
+        return getClass().getSimpleName() + "(" + messageExp + "," + TopicExp + ")";
     }
 
     @Override
     public <T> T accept(Visitors<T> visitor) {
-        return messageExp == null ? visitor.visitAddTopic(TopicExp) : visitor.visitAddMessage(messageExp, TopicExp);
+        return visitor.visitAdd(messageExp, TopicExp);
     }
 }
