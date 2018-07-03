@@ -25,9 +25,9 @@ public class StreamTokenizer implements Tokenizer {
         final String identRegEx = "([a-zA-Z][a-zA-Z0-9]*)"; // group 1
         final String numRegEx = "(0[bB][01]+|[1-9][0-9]*|0)"; // group 2
         final String skipRegEx = "(\\s+|//.*)"; // group 3
-        final String IPRegex = "(([0-9]+.){3}[0-9])";
-        final String MessageRegEx = "\"[^\"]*\"";
-        // final String symbolRegEx = "\\+|\\*|!|==|=|&&|\\(|\\)|;|,|\\{|\\}|-|::|:|\\[|\\]"; //4
+        final String IPRegex = "(([0-9]+.){3}[0-9])"; // group 4
+        final String MessageRegEx = "\"[^\"]*\""; // group 5
+        // final String symbolRegEx = "\\+|\\*|!|==|=|&&|\\(|\\)|;|,|\\{|\\}|-|::|:|\\[|\\]";
         regEx = identRegEx + "|" + numRegEx  + "|" + skipRegEx + "|" + IPRegex + "|" + MessageRegEx;
     }
 
@@ -38,6 +38,8 @@ public class StreamTokenizer implements Tokenizer {
         keywords.put("topics", OBJ);
         keywords.put("user", OBJ);
         keywords.put("on", ON);
+        keywords.put("connect", CONNECT);
+        keywords.put("disconnect", DISCONNECT);
     }
 
     /**

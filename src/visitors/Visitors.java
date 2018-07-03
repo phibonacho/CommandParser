@@ -19,7 +19,8 @@ public interface Visitors<T> {
     T visitIdent();
     T visitIPLiteral();
     T visitSingleExp(); //TODO: collassare su visitExp
-
+    T visitConnect(String ip);
+    T visitDisconnect();
     T visitProg(Stmt stmt);
     T visitStmt(Stmt single);
 

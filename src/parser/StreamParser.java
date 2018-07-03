@@ -1,7 +1,6 @@
 package parser;
 
 import parser.ast.*;
-import sun.nio.cs.US_ASCII;
 
 import static parser.TokenType.*;
 
@@ -60,6 +59,10 @@ public class StreamParser implements Parser {
                 return parseAddStmt();
             case LIST:
                 return parseListStmt();
+            case CONNECT:
+                return parseConnectStmt();
+            case DISCONNECT:
+                return parseDisconnectStmt();
         }
     }
 
@@ -93,6 +96,7 @@ public class StreamParser implements Parser {
         }
     }
 
+
     private Exp parseAtom() throws ParserException{
         switch (tokenizer.tokenType()){
             default:
@@ -101,6 +105,17 @@ public class StreamParser implements Parser {
                 return parseMessage();
 
         }
+    }
+
+    private Connect parseConnectStmt() throws ParserException {
+        consume(CONNECT);
+        String ip = tokenizer.IPValue();
+        return new Connect(ip);
+    }
+
+    private Disconnect parseDisconnectStmt() throws ParserException {
+        consume(DISCONNECT);
+        return new Disconnect();
     }
 
     private Message parseMessage() throws ParserException {
