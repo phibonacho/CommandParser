@@ -79,17 +79,18 @@ public class StreamParser implements Parser {
 
     AddStmt parseAddStmt() throws ParserException{
         consume(ADD);
-        switch (tokenizer.tokenType()){
+        Message msg = null;
+        TokenType found = tokenizer.tokenType();
+        consume(OBJ);
+        switch (found){
             default:
                 unexpectedTokenError();
             case MESSAGE:
-                Message msg = parseMessage();
+                msg = parseMessage();
                 consume(ON);
-                Ident topic = parseIdent();
-                return new AddStmt(msg, topic);
             case TOPIC:
                 Ident t = parseIdent();
-                return new AddStmt(null, t);
+                return new AddStmt(msg, t);
         }
     }
 
