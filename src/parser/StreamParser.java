@@ -91,16 +91,6 @@ public class StreamParser implements Parser {
         }
     }
 
-    private Exp parseAtom() throws ParserException{
-        switch (tokenizer.tokenType()){
-            default:
-                unexpectedTokenError();
-            case MESSAGE:
-                return parseMessage();
-
-        }
-    }
-
     private Ident parseOn() throws ParserException {
         if (tokenizer.tokenType()!= ON) return null;
         consume(ON);
