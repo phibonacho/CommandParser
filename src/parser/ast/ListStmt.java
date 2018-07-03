@@ -1,18 +1,19 @@
 package parser.ast;
 
+import parser.TokenType;
 import visitors.Visitors;
 
 public class ListStmt implements Stmt {
     protected final Ident Topic;
-    protected final ObjectLiteral obj;
+    protected final TokenType Type;
 
-    public ListStmt(Ident t, ObjectLiteral o){
-        Topic = t;
-        obj = o;
+    public ListStmt(TokenType type, Ident topic){
+        Topic = topic;
+        Type = type;
     }
     
     @Override
     public <T> T accept(Visitors<T> visitor) {
-        return Topic == null? visitor.visitListTopics() : visitor.visitListObj(Topic, obj);
+        return Topic == null? visitor.visitListTopics() : visitor.visitListObj(Type, Topic);
     }
 }

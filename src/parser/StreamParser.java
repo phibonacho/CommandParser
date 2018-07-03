@@ -63,22 +63,15 @@ public class StreamParser implements Parser {
         }
     }
 
-    // list user:
-    // list user on <Ident>
-    // list message on <Ident>
-    // list topic
+    // list user: restituisce gli utenti connessi su lato server
+    // list user on <Ident>: restituisce gli utenti registrati al topic
+    // list message on <Ident>: restituisce i messaggi postati su un topic
+    // list topic: restituisce i topic presenti su un server
     private ListStmt parseListStmt() throws ParserException {
         consume(LIST);
-        if(tokenizer.tokenType() == MESSAGE){
-            ObjectLiteral obj = new ObjectLiteral(tokenizer.tokenString());
-            consume(MESSAGE);
-            return new ListStmt(parseIdent(), obj); //TODO: capire come fare
-        }
-        if(tokenizer.tokenType() == USER){
-            ObjectLiteral obj = new ObjectLiteral(tokenizer.tokenString());
-            return new ListStmt(parseIdent(), obj);
-        }
-        return null;
+        TokenType found = tokenizer.tokenType();
+        consume(OBJ);
+        return new ListStmt(found, parseOn());
     }
 
     AddStmt parseAddStmt() throws ParserException{
@@ -106,6 +99,12 @@ public class StreamParser implements Parser {
                 return parseMessage();
 
         }
+    }
+
+    private Ident parseOn() throws ParserException {
+        if (tokenizer.tokenType()!= ON) return null;
+        consume(ON);
+        return parseIdent();
     }
 
     private Message parseMessage() throws ParserException {
