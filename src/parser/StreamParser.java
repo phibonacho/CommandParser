@@ -108,6 +108,7 @@ public class StreamParser implements Parser {
     private Connect parseConnectStmt() throws ParserException {
         consume(CONNECT);
         String ip = tokenizer.IPValue();
+        consume(IP);
         return new Connect(ip);
     }
 
