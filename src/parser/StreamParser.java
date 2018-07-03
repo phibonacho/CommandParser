@@ -63,6 +63,8 @@ public class StreamParser implements Parser {
                 return parseConnectStmt();
             case DISCONNECT:
                 return parseDisconnectStmt();
+            case HELP:
+                return parseHelpStmt();
         }
     }
 
@@ -109,6 +111,11 @@ public class StreamParser implements Parser {
     private Disconnect parseDisconnectStmt() throws ParserException {
         consume(DISCONNECT);
         return new Disconnect();
+    }
+
+    private Help parseHelpStmt() throws ParserException {
+        consume(HELP);
+        return  new Help();
     }
 
     private Message parseMessage() throws ParserException {

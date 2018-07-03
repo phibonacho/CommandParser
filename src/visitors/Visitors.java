@@ -24,6 +24,6 @@ public interface Visitors<T> {
     T visitDisconnect();
     T visitProg(Stmt stmt);
     T visitStmt(Stmt single);
-
+    T visitHelp();
     T visitAddMessage(String message);
 }
