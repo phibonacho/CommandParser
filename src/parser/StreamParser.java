@@ -63,6 +63,10 @@ public class StreamParser implements Parser {
         }
     }
 
+    // list user:
+    // list user on <Ident>
+    // list message on <Ident>
+    // list topic
     private ListStmt parseListStmt() throws ParserException {
         consume(LIST);
         if(tokenizer.tokenType() == MESSAGE){
