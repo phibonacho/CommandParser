@@ -41,6 +41,7 @@ public class StreamTokenizer implements Tokenizer {
         keywords.put("on", ON);
         keywords.put("connect", CONNECT);
         keywords.put("disconnect", DISCONNECT);
+        keywords.put("help", HELP);
     }
 
     static {
