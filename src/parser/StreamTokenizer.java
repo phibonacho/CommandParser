@@ -25,11 +25,9 @@ public class StreamTokenizer implements Tokenizer {
         // token type
         final String stringRegEx = "(\"[^\"\\n]*\")";
         final String identRegEx = "([a-zA-Z][a-zA-Z0-9,\\./]*)"; // group 1
-        final String numRegEx = "(0[bB][01]+|[1-9][0-9]*|0)"; // group 2
         final String skipRegEx = "(\\s+|\\.*)"; // group 3
         final String IPRegex = "([0-9]+.){3}[0-9]+"; // group 4
-        final String symbolRegEx = "\"|\\+|\\*|!|==|=|&&|\\(|\\)|;|,|\\{|\\}|-|::|:|\\[|\\]";
-        regEx = stringRegEx + "|" + IPRegex + "|" + identRegEx + /*"|" + numRegEx  +*/ "|" + skipRegEx /*+ "|" + symbolRegEx*/;
+        regEx = stringRegEx + "|" + IPRegex + "|" + identRegEx + "|" + skipRegEx;
     }
 
     static {
@@ -64,8 +62,7 @@ public class StreamTokenizer implements Tokenizer {
     private void checkType() {
         tokenString = scanner.group();
 
-        if(scanner.group(MESSAGELIT.ordinal()) != null){
-            System.err.println("Found a string...");
+        if(scanner.group(MESSAGELIT.ordinal()) != null){ // MESSAGELIT
             tokenType = MESSAGELIT;
             MessageValue = tokenString.substring(1, tokenString.length()-1);
             return;
@@ -79,8 +76,7 @@ public class StreamTokenizer implements Tokenizer {
                 IPValue = tokenString;
             return;
         }
-        if (scanner.group(IP.ordinal()) != null) { // NUM
-            System.err.println("Found an IP...");
+        if (scanner.group(IP.ordinal()) != null) { // IP
             tokenType = IP;
             IPValue = tokenString;
             return;

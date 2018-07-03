@@ -11,9 +11,11 @@ public interface Visitors<T> {
     T visitAddTopic(Exp t);
 
     T visitListTopics();
-    T visitListObj(TokenType t, Ident o);
+    T visitList(TokenType t, Ident o);
 
     T visitSub();
+    T visitUnsub();
+
     T visitConnect();
     T visitDiscconnect();
     T visitIntLiteral();
