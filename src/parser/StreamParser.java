@@ -69,8 +69,9 @@ public class StreamParser implements Parser {
     public void plays() throws ParserException{
         Stmt stmt;
         do{
-            stmt = parseStmt();
             tryNext();
+            System.err.println("Entered plays loop");
+            stmt = parseStmt();
             stmt.accept(eval);
         } while(!(stmt instanceof ExitStmt) && tokenizer.tokenType() == NEWLINE);
     }
