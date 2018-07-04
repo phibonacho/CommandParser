@@ -52,7 +52,7 @@ public class StreamScanner implements Scanner {
 		String line;
 		if (matcher.regionStart() == matcher.regionEnd()) {
 			try {
-				line = buffReader.readLine();
+				line = buffReader.readLine()+"\n";
 			} catch (IOException e) {
 				throw new ScannerException(e);
 			}

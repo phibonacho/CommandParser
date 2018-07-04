@@ -27,6 +27,6 @@ public class SimpleIdent implements Ident {
 
     @Override
     public <T> T accept(Visitors<T> visitor) {
-        return visitor.visitIdent();
+        return visitor.visitIdent(id);
     }
 }

@@ -23,9 +23,10 @@ public class StreamTokenizer implements Tokenizer {
         // token type
         final String stringRegEx = "(\"[^\"\\n]*\")";
         final String identRegEx = "([a-zA-Z][a-zA-Z0-9,\\./]*)"; // group 1
+        final String newLineRegEx = "(\\n)";
         final String skipRegEx = "(\\s+|\\.*)"; // group 3
         final String IPRegex = "([0-9]+.){3}[0-9]+"; // group 4
-        regEx = stringRegEx + "|" + IPRegex + "|" + identRegEx + "|" + skipRegEx;
+        regEx = stringRegEx + "|" + IPRegex + "|" + identRegEx + "|" + newLineRegEx + "|" + skipRegEx;
     }
 
     static {
@@ -35,12 +36,15 @@ public class StreamTokenizer implements Tokenizer {
         keywords.put("topic", TOPIC);
         keywords.put("user", USER);
         keywords.put("in", IN);
+        keywords.put("as", AS);
         keywords.put("connect", CONNECT);
         keywords.put("disconnect", DISCONNECT);
         keywords.put("help", HELP);
         keywords.put("subscribe", SUBSCRIBE);
         keywords.put("unsubscribe", UNSUBSCRIBE);
         keywords.put("remove", REMOVE);
+        keywords.put("\n", NEWLINE);
+        keywords.put("exit", EXIT);
     }
 
     /**
@@ -76,6 +80,11 @@ public class StreamTokenizer implements Tokenizer {
         if (scanner.group(IP.ordinal()) != null) { // IP
             tokenType = IP;
             IPValue = tokenString;
+            return;
+        }
+
+        if(scanner.group(NEWLINE.ordinal()) != null) {
+            tokenType = NEWLINE;
             return;
         }
 

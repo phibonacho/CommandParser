@@ -20,6 +20,6 @@ public class AddStmt implements Stmt{
 
     @Override
     public <T> T accept(Visitors<T> visitor) {
-        return visitor.visitAdd(messageExp, TopicExp);
+        return visitor.visitAdd(messageExp==null? null : messageExp.getMessage(), TopicExp.getName());
     }
 }

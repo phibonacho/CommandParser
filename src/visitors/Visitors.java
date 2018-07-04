@@ -5,25 +5,27 @@ import parser.ast.*;
 
 public interface Visitors<T> {
 
-    T visitObjectLiteral(String obj);
 
-    T visitAdd(Exp m, Exp t);
+    T visitAdd(String m, String t);
+    T visitRemove(TokenType e, String l,  Ident t);
 
     T visitList(TokenType t, Ident o);
 
     T visitUnsubscribe(Ident Topic);
 
-    T visitIdent();
-    T visitIPLiteral();
-    T visitSingleExp(); //TODO: collassare su visitExp
+    T visitIdent(String id);
 
-    T visitConnect(String ip);
+    T visitConnect(String ip, String username);
     T visitDisconnect();
 
-    T visitProg(Stmt stmt);
+    T visitProg(StmtSeq stmt);
     T visitStmt(Stmt single);
     T visitAddMessage(String message);
     T visitSubscribe(Ident Topic);
 
     T visitHelp();
+
+    T visitMoreStmt(Stmt first, StmtSeq rest);
+
+    T visitExit();
 }

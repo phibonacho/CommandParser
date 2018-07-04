@@ -1,6 +1,6 @@
-package Parser.ast;
+package parser.ast;
 
-import visitors.Visitor;
+import visitors.Visitors;
 
 public class MoreStmt extends More<Stmt, StmtSeq> implements StmtSeq {
 
@@ -9,7 +9,7 @@ public class MoreStmt extends More<Stmt, StmtSeq> implements StmtSeq {
 	}
 
 	@Override
-	public <T> T accept(Visitor<T> visitor) {
+	public <T> T accept(Visitors<T> visitor) {
 		return visitor.visitMoreStmt(first, rest);
 	}
 }

@@ -1,6 +1,7 @@
 package parser;
 
 import parser.ast.*;
+import visitors.evaluation.Eval;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,6 +11,7 @@ import static parser.TokenType.*;
 
 public class StreamParser implements Parser {
     private final Tokenizer tokenizer;
+    private Eval eval = new Eval();
 
     /**
      * Constructor
@@ -50,9 +52,27 @@ public class StreamParser implements Parser {
     @Override
     public Prog parseProg() throws ParserException {
         tryNext(); // one look-ahead symbol
-        Prog prog = new ProgClass(parseStmt());
-        match(EOF);
+        Prog prog = new ProgClass(parseStmtSeq());
+        // match(EXIT);
         return prog;
+    }
+
+    private StmtSeq parseStmtSeq() throws ParserException {
+        Stmt stmt = parseStmt();
+        if ( !(stmt instanceof ExitStmt) && tokenizer.tokenType() == NEWLINE) {
+            tryNext();
+            return new MoreStmt(stmt, parseStmtSeq());
+        }
+        return new SingleStmt(stmt);
+    }
+
+    public void plays() throws ParserException{
+        Stmt stmt;
+        do{
+            stmt = parseStmt();
+            tryNext();
+            stmt.accept(eval);
+        } while(!(stmt instanceof ExitStmt) && tokenizer.tokenType() == NEWLINE);
     }
 
     private Stmt parseStmt() throws ParserException {
@@ -61,6 +81,8 @@ public class StreamParser implements Parser {
                 unexpectedTokenError();
             case ADD:
                 return parseAddStmt();
+            case REMOVE:
+                return parseRemoveStmt();
             case LIST:
                 return parseListStmt();
             case CONNECT:
@@ -73,7 +95,32 @@ public class StreamParser implements Parser {
                 return parseUnsubscribe();
             case HELP:
                 return parseHelpStmt();
+            case EXIT:
+                return parseExitStmt();
         }
+    }
+
+    private Stmt parseRemoveStmt() throws ParserException {
+        consume(REMOVE);
+        String toRemove = null;
+        TokenType found = tokenizer.tokenType();
+        tryNext();
+        switch (found){
+            default:
+                unexpectedTokenError();
+            case USER:
+                toRemove = parseIdent().getName();
+            case MESSAGE:
+                if(toRemove == null) toRemove = parseMessage().getMessage();
+            case TOPIC:
+                Ident Topic = parseIn();
+                return new RemoveStmt(found, toRemove, Topic);
+        }
+    }
+
+    private Stmt parseExitStmt() throws ParserException {
+        consume(EXIT);
+        return new ExitStmt();
     }
 
     // list user: restituisce gli utenti connessi su lato server
@@ -84,19 +131,19 @@ public class StreamParser implements Parser {
         consume(LIST);
         TokenType found = tokenizer.tokenType();
         consume(found);
-        return new ListStmt(found, parseOn());
+        return new ListStmt(found, parseIn());
     }
 
     private AddStmt parseAddStmt() throws ParserException{
         Message msg = null;
         consume(ADD);
-        switch (tokenizer.tokenType()){
+        TokenType found = tokenizer.tokenType();
+        tryNext();
+        switch (found){
             default:
                 unexpectedTokenError();
             case MESSAGE:
-                tryNext();
                 msg = parseMessage();
-                System.err.println(msg.toString());
                 consume(IN);
             case TOPIC:
                 return new AddStmt(msg, parseIdent());
@@ -117,7 +164,9 @@ public class StreamParser implements Parser {
         consume(CONNECT);
         String ip = tokenizer.IPValue();
         consume(IP);
-        return new Connect(ip);
+        consume(AS);
+        Ident username = parseIdent();
+        return new Connect(ip, username.getName());
     }
 
     private Disconnect parseDisconnectStmt() throws ParserException {
@@ -142,8 +191,8 @@ public class StreamParser implements Parser {
         return new SimpleIdent(name);
     }
 
-    private Ident parseOn() throws ParserException {
-        if (tokenizer.tokenType()!= IN) return null;
+    private Ident parseIn() throws ParserException { // opzionale, gli statement che non specificano il topic, sono quelli che operano su server...
+        if(tokenizer.tokenType()!=IN) return null;
         consume(IN);
         return parseIdent();
     }
@@ -152,8 +201,10 @@ public class StreamParser implements Parser {
         try (Tokenizer tokenizer = new StreamTokenizer(
                 args.length > 0 ? new FileReader(args[0]) : new InputStreamReader(System.in))) {
             Parser parser = new StreamParser(tokenizer);
-            System.out.println("sono qui");
+            System.err.println("Already here darling..");
+            ((StreamParser) parser).plays();
             Prog prog = parser.parseProg();
+            prog.accept(new Eval());
         }
         catch(ParserException pe){
             System.err.println("Syntax error: "+ pe.getMessage());

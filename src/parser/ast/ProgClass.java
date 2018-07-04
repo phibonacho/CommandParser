@@ -5,9 +5,9 @@ import visitors.Visitors;
 import static java.util.Objects.requireNonNull;
 
 public class ProgClass implements Prog {
-	private final Stmt stmt;
+	private final StmtSeq stmt;
 
-	public ProgClass(Stmt stmt) {
+	public ProgClass(StmtSeq stmt) {
 		this.stmt = requireNonNull(stmt);
 	}
 

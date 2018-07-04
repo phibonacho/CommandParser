@@ -1,0 +1,143 @@
+package visitors.evaluation;
+
+import RMIForum.Broker.BrokerClass;
+import parser.TokenType;
+import parser.ast.Ident;
+import parser.ast.Stmt;
+import parser.ast.StmtSeq;
+import visitors.Visitors;
+
+import java.net.UnknownHostException;
+import java.rmi.RemoteException;
+
+public class Eval implements Visitors<Value> {
+
+    private BrokerClass broker = null;
+
+    {
+        try {
+            broker = new BrokerClass();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        System.err.println("Successfully init");
+    }
+
+    @Override
+    public Value visitAdd(String m, String t) {
+        // add topics:
+        if(m==null){
+            try {
+                broker.AddTopicRequest(t);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            // publish message:
+            try {
+                broker.PublishRequest(m, t);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Value visitRemove(TokenType e, String l, Ident t) {
+        switch (e){
+            case MESSAGE:
+                broker.removeMessage(t.getName(), l);
+                break;
+            case TOPIC:
+                broker.removeTopic(t.getName());
+                break;
+            case USER:
+                broker.kickUser(l);
+                break;
+        }
+        return null;
+    }
+
+    @Override
+    public Value visitList(TokenType t, Ident o) {
+        return null;
+    }
+
+    @Override
+    public Value visitUnsubscribe(Ident Topic) {
+        try {
+            broker.Unsubscribe(Topic.getName());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Value visitIdent(String id) {
+        return null;
+    }
+
+    @Override
+    public Value visitConnect(String ip, String username) {
+        try {
+            broker.ConnectionRequest(ip, username);
+        } catch (RemoteException e) {
+            System.err.println("Cannot connect: "+e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public Value visitDisconnect() {
+        broker.Disconnect();
+        return null;
+    }
+
+    @Override
+    public Value visitProg(StmtSeq stmt) {
+        stmt.accept(this);
+        return null;
+    }
+
+    @Override
+    public Value visitStmt(Stmt single) {
+        single.accept(this);
+        return null;
+    }
+
+    @Override
+    public Value visitAddMessage(String message) {
+        return null;
+    }
+
+    @Override
+    public Value visitSubscribe(Ident Topic) {
+        try {
+            broker.Subscribe(Topic.getName());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Value visitHelp() {
+
+        return null;
+    }
+
+    @Override
+    public Value visitMoreStmt(Stmt first, StmtSeq rest) {
+        first.accept(this);
+        rest.accept(this);
+        return null;
+    }
+
+    @Override
+    public Value visitExit() {
+        return null;
+    }
+}
