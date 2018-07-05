@@ -9,6 +9,7 @@ import visitors.Visitors;
 
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.util.List;
 
 public class Eval implements Visitors<Value> {
 
@@ -62,6 +63,37 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitList(TokenType t, Ident o) {
+        System.out.println("Visiting list statement, with tokentype: "+t);
+        List<String> toList = null;
+        switch (t){
+            case TOPIC:
+                try {
+                    toList = broker.getTopics().ListTopicName();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case MESSAGE:
+                try {
+                    toList = broker.getTopics().getTopicNamed(o.getName()).ListMessages();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case USER:
+                if(o == null) toList = broker.getConnectedUsers();
+                else {
+                    try {
+                        toList = broker.getTopics().getTopicNamed(o.getName()).ListUsers();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+        }
+        System.out.println("Exited switch");
+        if(toList == null) System.out.println("No "+ t +" available");
+        else for(String it : toList) System.out.println(it);
         return null;
     }
 
@@ -138,6 +170,12 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitExit() {
+        return null;
+    }
+
+    @Override
+    public Value visitStart(String ip) {
+        broker.start(ip);
         return null;
     }
 }

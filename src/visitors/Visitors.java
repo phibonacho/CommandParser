@@ -28,4 +28,6 @@ public interface Visitors<T> {
     T visitMoreStmt(Stmt first, StmtSeq rest);
 
     T visitExit();
+
+    T visitStart(String ip);
 }

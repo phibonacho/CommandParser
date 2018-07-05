@@ -45,6 +45,7 @@ public class StreamTokenizer implements Tokenizer {
         keywords.put("remove", REMOVE);
         keywords.put("\n", NEWLINE);
         keywords.put("exit", EXIT);
+        keywords.put("start", START);
     }
 
     /**

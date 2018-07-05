@@ -6,6 +6,7 @@ import visitors.evaluation.Eval;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.sql.SQLSyntaxErrorException;
 
 import static parser.TokenType.*;
 
@@ -70,10 +71,12 @@ public class StreamParser implements Parser {
         Stmt stmt;
         do{
             tryNext();
-            System.err.println("Entered plays loop");
             stmt = parseStmt();
+            if(stmt instanceof ExitStmt) break;
+            System.err.println("About to evaluate..");
             stmt.accept(eval);
-        } while(!(stmt instanceof ExitStmt) && tokenizer.tokenType() == NEWLINE);
+            System.err.println("Evaluated");
+        } while(tokenizer.tokenType() == NEWLINE);
     }
 
     private Stmt parseStmt() throws ParserException {
@@ -94,11 +97,20 @@ public class StreamParser implements Parser {
                 return parseSubscribe();
             case UNSUBSCRIBE:
                 return parseUnsubscribe();
+            case START:
+                return parseStartStmt();
             case HELP:
                 return parseHelpStmt();
             case EXIT:
                 return parseExitStmt();
         }
+    }
+
+    private StartStmt parseStartStmt() throws ParserException {
+        consume(START);
+        String ip = tokenizer.IPValue();
+        consume(IP);
+        return new StartStmt(ip);
     }
 
     private Stmt parseRemoveStmt() throws ParserException {
@@ -131,8 +143,15 @@ public class StreamParser implements Parser {
     private ListStmt parseListStmt() throws ParserException {
         consume(LIST);
         TokenType found = tokenizer.tokenType();
-        consume(found);
-        return new ListStmt(found, parseIn());
+        System.err.println("Found: "+found);
+        tryNext();
+        switch (found){
+            default:
+                return new ListStmt(found, parseIn());
+            case TOPIC:
+                System.err.println("Calling ListStmt");
+                return new ListStmt(found, null);
+        }
     }
 
     private AddStmt parseAddStmt() throws ParserException{
