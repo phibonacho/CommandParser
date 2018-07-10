@@ -81,7 +81,7 @@ public class Eval implements Visitors<Value> {
                 }
                 break;
             case USER:
-                if(o == null) toList = broker.getConnectedgit Users();
+                if(o == null) toList = broker.getConnectedUsers();
                 else {
                     try {
                         toList = broker.getTopics().getTopicNamed(o.getName()).ListUsers();
