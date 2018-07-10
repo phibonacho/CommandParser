@@ -21,6 +21,7 @@ public class StreamTokenizer implements Tokenizer {
     static {
         // remark: groups must correspond to the ordinal of the corresponding
         // token type
+        final String lessThan256 = "((2(5[0-5]|[0-4][0-9])|1?[1-9]?[0-9]).){3}(2(5[0-5]|[0-4][0-9])|1?[1-9]?[0-9])";
         final String stringRegEx = "(\"[^\"\\n]*\")";
         final String identRegEx = "([a-zA-Z][a-zA-Z0-9,\\./]*)"; // group 1
         final String newLineRegEx = "(\\n)";
