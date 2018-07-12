@@ -21,7 +21,6 @@ public class Eval implements Visitors<Value> {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        System.err.println("Successfully init");
     }
 
     @Override

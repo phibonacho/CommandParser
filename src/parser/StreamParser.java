@@ -71,6 +71,7 @@ public class StreamParser implements Parser {
         Stmt stmt;
         do{
             tryNext();
+//            System.out.print("["+System.getProperty("user.name")+"]> ");
             stmt = parseStmt();
             if(stmt instanceof ExitStmt) break;
             System.err.println("About to evaluate..");
@@ -108,9 +109,8 @@ public class StreamParser implements Parser {
 
     private StartStmt parseStartStmt() throws ParserException {
         consume(START);
-        String ip = tokenizer.IPValue();
-        consume(IP);
-        return new StartStmt(ip);
+        IP ip = parseIP(); // creare tipo IP... altrimenti restituisce invalid state exception....
+        return new StartStmt(ip.getIp());
     }
 
     private Stmt parseRemoveStmt() throws ParserException {
@@ -211,6 +211,12 @@ public class StreamParser implements Parser {
         return new SimpleIdent(name);
     }
 
+    private parser.ast.IP parseIP() throws ParserException {
+        String ip = tokenizer.tokenString();
+        consume(IP);
+        return new SimpleIP(ip);
+    }
+
     private Ident parseIn() throws ParserException { // opzionale, gli statement che non specificano il topic, sono quelli che operano su server...
         if(tokenizer.tokenType()!=IN) return null;
         consume(IN);
@@ -221,7 +227,6 @@ public class StreamParser implements Parser {
         try (Tokenizer tokenizer = new StreamTokenizer(
                 args.length > 0 ? new FileReader(args[0]) : new InputStreamReader(System.in))) {
             Parser parser = new StreamParser(tokenizer);
-            System.err.println("Already here darling..");
             ((StreamParser) parser).plays();
             Prog prog = parser.parseProg();
             prog.accept(new Eval());
@@ -229,7 +234,7 @@ public class StreamParser implements Parser {
         catch(ParserException pe){
             System.err.println("Syntax error: "+ pe.getMessage());
         } catch (TokenizerException e) {
-            e.printStackTrace();
+            System.err.println("unexpected token: "+e.getMessage());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

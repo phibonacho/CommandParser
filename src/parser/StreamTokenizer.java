@@ -25,7 +25,7 @@ public class StreamTokenizer implements Tokenizer {
         final String identRegEx = "([a-zA-Z][a-zA-Z0-9,\\./]*)"; // group 1
         final String newLineRegEx = "(\\n)";
         final String skipRegEx = "(\\s+|\\.*)"; // group 3
-        final String IPRegex = "((2(5[0-5]|[0-4][0-9])|1?[1-9]?[0-9]).){3}(2(5[0-5]|[0-4][0-9])|1?[1-9]?[0-9])";//"([0-9]+.){3}[0-9]+"; // group 4
+        final String IPRegex = "([0-9]+.){3}[0-9]+"; // group 4
         regEx = stringRegEx + "|" + IPRegex + "|" + identRegEx + "|" + newLineRegEx + "|" + skipRegEx;
     }
 
@@ -69,13 +69,10 @@ public class StreamTokenizer implements Tokenizer {
             MessageValue = tokenString.substring(1, tokenString.length()-1);
             return;
         }
-
         if (scanner.group(IDENT.ordinal()) != null) { // IDENT or a keyword
             tokenType = keywords.get(tokenString);
             if (tokenType == null)
                 tokenType = IDENT;
-            if(tokenType == IP)
-                IPValue = tokenString;
             return;
         }
         if (scanner.group(IP.ordinal()) != null) { // IP
@@ -93,7 +90,7 @@ public class StreamTokenizer implements Tokenizer {
             tokenType = SKIP;
             return;
         }
-
+        System.err.println(tokenString+", no type found...");
         throw new AssertionError("Fatal error");
     }
 
