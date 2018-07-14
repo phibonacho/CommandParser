@@ -2,17 +2,18 @@ package visitors.evaluation;
 
 import RMIForum.Broker.BrokerClass;
 import parser.TokenType;
-import parser.ast.Ident;
-import parser.ast.Stmt;
-import parser.ast.StmtSeq;
+import parser.ast.*;
 import visitors.Visitors;
 
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class Eval implements Visitors<Value> {
-
+    private String Sprompt = System.getProperty("user.name");
+    private String Uprompt;
+    private boolean usermode = false;
     private BrokerClass broker = null;
 
     {
@@ -26,6 +27,10 @@ public class Eval implements Visitors<Value> {
     @Override
     public Value visitAdd(String m, String t) {
         // add topics:
+        if(!usermode){
+            System.err.println("You can't add topics in server mode...");
+            return null;
+        }
         if(m==null){
             try {
                 broker.AddTopicRequest(t);
@@ -54,7 +59,8 @@ public class Eval implements Visitors<Value> {
                 broker.removeTopic(t.getName());
                 break;
             case USER:
-                broker.kickUser(l);
+                if(usermode) System.err.println("Yopu can't delete user in User Mode...");
+                else broker.kickUser(l);
                 break;
         }
         return null;
@@ -62,12 +68,12 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitList(TokenType t, Ident o) {
-        System.out.println("Visiting list statement, with tokentype: "+t);
         List<String> toList = null;
         switch (t){
             case TOPIC:
                 try {
-                    toList = broker.getTopics().ListTopicName();
+                    if(!usermode) toList = broker.getTopics().ListTopicName();
+                    else toList = broker.getServerTopics().ListTopicName();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -77,10 +83,18 @@ public class Eval implements Visitors<Value> {
                     toList = broker.getTopics().getTopicNamed(o.getName()).ListMessages();
                 } catch (RemoteException e) {
                     e.printStackTrace();
+                } catch (NoSuchElementException nse){
+                    System.err.println("No topic named <"+o.getName()+"> found...");
+                    return null;
                 }
                 break;
             case USER:
-                if(o == null) toList = broker.getConnectedUsers();
+                if(o == null)
+                    if(!usermode)toList = broker.getConnectedUsers();
+                    else{
+                        System.err.println("You can't list users in User Mode");
+                        return null;
+                    }
                 else {
                     try {
                         toList = broker.getTopics().getTopicNamed(o.getName()).ListUsers();
@@ -90,7 +104,6 @@ public class Eval implements Visitors<Value> {
                 }
                 break;
         }
-        System.out.println("Exited switch");
         if(toList == null) System.out.println("No "+ t +" available");
         else for(String it : toList) System.out.println(it);
         return null;
@@ -117,7 +130,9 @@ public class Eval implements Visitors<Value> {
             broker.ConnectionRequest(ip, username);
         } catch (RemoteException e) {
             System.err.println("Cannot connect: "+e.getMessage());
+            return null;
         }
+        Uprompt=(username+"@"+ip);
         return null;
     }
 
@@ -156,7 +171,6 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitHelp() {
-
         return null;
     }
 
@@ -169,12 +183,30 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitExit() {
+        if(broker.GetConnectonStatus()) return visitDisconnect();
+        broker.shutdown();
         return null;
     }
 
     @Override
-    public Value visitStart(String ip) {
-        broker.start(ip);
+    public Value visitStart(IP ip) {
+        broker.start(ip.accept(this).toString());
+        Sprompt= Sprompt+"@"+ip.getIp();
         return null;
+    }
+
+    @Override
+    public Value visitIP(String ip) {
+        return new StringValue(ip);
+    }
+
+    @Override
+    public Value visitSwitch() {
+        usermode = !usermode;
+        return null;
+    }
+
+    public String getPrompt(){
+        return usermode?Uprompt:Sprompt;
     }
 }

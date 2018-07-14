@@ -27,6 +27,6 @@ public class SimpleIP implements IP {
 
     @Override
     public <T> T accept(Visitors<T> visitor) {
-        return visitor.visitIdent(ip);
+        return visitor.visitIP(ip);
     }
 }

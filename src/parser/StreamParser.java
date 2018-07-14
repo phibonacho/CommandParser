@@ -1,5 +1,6 @@
 package parser;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import parser.ast.*;
 import visitors.evaluation.Eval;
 
@@ -11,6 +12,7 @@ import java.sql.SQLSyntaxErrorException;
 import static parser.TokenType.*;
 
 public class StreamParser implements Parser {
+
     private final Tokenizer tokenizer;
     private Eval eval = new Eval();
 
@@ -26,7 +28,7 @@ public class StreamParser implements Parser {
      * Aux Functions
      * @throws ParserException
      */
-    private void tryNext() throws ParserException {
+    public void tryNext() throws ParserException {
         try {
             tokenizer.next();
         } catch (TokenizerException e) {
@@ -70,20 +72,19 @@ public class StreamParser implements Parser {
     public void plays() throws ParserException{
         Stmt stmt;
         do{
-            tryNext();
-//            System.out.print("["+System.getProperty("user.name")+"]> ");
+
             stmt = parseStmt();
-            if(stmt instanceof ExitStmt) break;
-            System.err.println("About to evaluate..");
             stmt.accept(eval);
-            System.err.println("Evaluated");
-        } while(tokenizer.tokenType() == NEWLINE);
+        } while(tokenizer.tokenType() != EXIT);
     }
 
-    private Stmt parseStmt() throws ParserException {
+    public Stmt parseStmt() throws ParserException {
+        tryNext();
         switch(tokenizer.tokenType()){
             default:
                 unexpectedTokenError();
+            case NEWLINE:
+                return parseStmt();
             case ADD:
                 return parseAddStmt();
             case REMOVE:
@@ -110,7 +111,7 @@ public class StreamParser implements Parser {
     private StartStmt parseStartStmt() throws ParserException {
         consume(START);
         IP ip = parseIP(); // creare tipo IP... altrimenti restituisce invalid state exception....
-        return new StartStmt(ip.getIp());
+        return new StartStmt(ip);
     }
 
     private Stmt parseRemoveStmt() throws ParserException {
@@ -143,13 +144,11 @@ public class StreamParser implements Parser {
     private ListStmt parseListStmt() throws ParserException {
         consume(LIST);
         TokenType found = tokenizer.tokenType();
-        System.err.println("Found: "+found);
         tryNext();
         switch (found){
             default:
                 return new ListStmt(found, parseIn());
             case TOPIC:
-                System.err.println("Calling ListStmt");
                 return new ListStmt(found, null);
         }
     }

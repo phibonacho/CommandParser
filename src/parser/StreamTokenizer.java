@@ -46,6 +46,7 @@ public class StreamTokenizer implements Tokenizer {
         keywords.put("\n", NEWLINE);
         keywords.put("exit", EXIT);
         keywords.put("start", START);
+        keywords.put("switchmode", SWITCH);
     }
 
     /**

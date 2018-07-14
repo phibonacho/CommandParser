@@ -29,5 +29,9 @@ public interface Visitors<T> {
 
     T visitExit();
 
-    T visitStart(String ip);
+    T visitStart(IP ip);
+
+    T visitIP(String ip);
+
+    T visitSwitch();
 }

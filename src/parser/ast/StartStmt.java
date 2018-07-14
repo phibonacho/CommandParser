@@ -5,9 +5,9 @@ import visitors.Visitors;
 import static java.util.Objects.requireNonNull;
 
 public class StartStmt implements Stmt {
-    private final String Ip;
+    private final IP Ip;
 
-    public StartStmt(String ip){
+    public StartStmt(IP ip){
         Ip = requireNonNull(ip);
     }
 
