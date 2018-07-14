@@ -1,13 +1,11 @@
 package parser;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import parser.ast.*;
 import visitors.evaluation.Eval;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStreamReader;
-import java.sql.SQLSyntaxErrorException;
 
 import static parser.TokenType.*;
 
