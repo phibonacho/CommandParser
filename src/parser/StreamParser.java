@@ -83,6 +83,8 @@ public class StreamParser implements Parser {
         switch(tokenizer.tokenType()){
             default:
                 unexpectedTokenError();
+            case SWITCH:
+                return parseSwitch();
             case NEWLINE:
                 return parseStmt();
             case ADD:
@@ -106,6 +108,11 @@ public class StreamParser implements Parser {
             case EXIT:
                 return parseExitStmt();
         }
+    }
+
+    private Stmt parseSwitch() throws ParserException {
+        consume(SWITCH);
+        return new SwitchStmt();
     }
 
     private StartStmt parseStartStmt() throws ParserException {

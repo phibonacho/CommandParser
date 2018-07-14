@@ -133,6 +133,7 @@ public class Eval implements Visitors<Value> {
             return null;
         }
         Uprompt=(username+"@"+ip);
+        usermode = !usermode;
         return null;
     }
 
