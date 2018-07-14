@@ -41,9 +41,11 @@ public class Eval implements Visitors<Value> {
         else{
             // publish message:
             try {
-                broker.PublishRequest(m, t);
+                if(!broker.PublishRequest(m, t))System.err.println("You must be subscribe to "+t+" if you want to send messages.");
             } catch (RemoteException e) {
                 e.printStackTrace();
+            } catch (NoSuchElementException nse){
+                System.err.println("No topic named <"+t+">");
             }
         }
         return null;
@@ -80,7 +82,8 @@ public class Eval implements Visitors<Value> {
                 break;
             case MESSAGE:
                 try {
-                    toList = broker.getTopics().getTopicNamed(o.getName()).ListMessages();
+                    if(!usermode) toList = broker.getTopics().getTopicNamed(o.getName()).ListMessages();
+                    else toList = broker.getServerTopics().getTopicNamed(o.getName()).ListMessages();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 } catch (NoSuchElementException nse){
@@ -97,9 +100,9 @@ public class Eval implements Visitors<Value> {
                     }
                 else {
                     try {
-                        toList = broker.getTopics().getTopicNamed(o.getName()).ListUsers();
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
+                        toList = broker.getServerTopics().getTopicNamed(o.getName()).ListUsers();
+                    } catch (NoSuchElementException e) {
+                        System.err.println("No topic named <"+o.getName()+"> found..");
                     }
                 }
                 break;

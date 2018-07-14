@@ -2,7 +2,6 @@ package Test;
 
 import parser.*;
 import parser.ast.ExitStmt;
-import parser.ast.Prog;
 import parser.ast.Stmt;
 import visitors.evaluation.Eval;
 
