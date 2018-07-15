@@ -147,6 +147,8 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitDisconnect() {
+        Uprompt = null;
+        usermode = !usermode;
         broker.disconnect();
         return null;
     }
