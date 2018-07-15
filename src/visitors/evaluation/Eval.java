@@ -191,6 +191,7 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitExit() {
+        visitDisconnect();
         broker.shutdown();
         return null;
     }
@@ -209,6 +210,10 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitSwitch() {
+        if(Uprompt==null){
+            System.err.println("You must connect first in order to switch to user mode");
+            return null;
+        }
         usermode = !usermode;
         return null;
     }

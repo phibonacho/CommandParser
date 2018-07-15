@@ -14,7 +14,6 @@ public class StreamTokenizer implements Tokenizer {
     // token
     private TokenType tokenType;
     private String tokenString;
-    private String IPValue;
     private String MessageValue;
     private final Scanner scanner;
 
@@ -78,7 +77,6 @@ public class StreamTokenizer implements Tokenizer {
         }
         if (scanner.group(IP.ordinal()) != null) { // IP
             tokenType = IP;
-            IPValue = tokenString;
             return;
         }
 
@@ -154,7 +152,7 @@ public class StreamTokenizer implements Tokenizer {
     @Override
     public String IPValue() {
         checkValidToken(IP);
-        return IPValue;
+        return tokenString;
     }
 
     @Override
