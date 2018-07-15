@@ -1,16 +1,32 @@
 package Test;
 
+import GUI.LogFrame;
 import parser.*;
 import parser.ast.ExitStmt;
 import parser.ast.Stmt;
 import visitors.evaluation.Eval;
 
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 
 public class TestMain {
     public static void main(String [] args){
         final String ANSI_BLUE = "\u001B[34m";
         final String ANSI_RESET = "\u001B[0m";
+        LogFrame lf = new LogFrame();
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                lf.setVisible(true);
+            }
+        });
+        System.setErr(new PrintStream(System.err){
+            public void println(String s) {
+                if (s.contains("ServerDebug")) lf.printServerLog(s.substring(s.indexOf("]:" + 1, s.length())));
+                else if (s.contains("ClientDebug")) lf.printClientLog(s.substring(s.indexOf("]:" + 1, s.length())));
+                else super.println(s);
+            }
+        });
         Eval eval = new Eval();
         Stmt stmt;
         Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(System.in));
@@ -24,8 +40,6 @@ public class TestMain {
                 }
                 catch(ParserException pe) {
                     System.err.println("Syntax error: " + pe.getMessage());
-
-                    continue;
                 }
             }while(true);
             System.err.println("Exited");

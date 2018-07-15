@@ -138,6 +138,8 @@ public class Eval implements Visitors<Value> {
         } catch (RemoteException e) {
             System.err.println("Cannot connect: "+e.getMessage());
             return null;
+        } catch (IllegalArgumentException iae){
+            System.err.println("No port available...");
         }
         return null;
     }
