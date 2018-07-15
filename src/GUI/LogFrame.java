@@ -25,12 +25,12 @@ public class LogFrame extends javax.swing.JFrame {
 
     public void printClientLog(String s){
         ClientArea.append(s+"\n");
-        ClientArea.setCaretPosition(ServerArea.getDocument().getLength());
+        ClientArea.setCaretPosition(ClientArea.getDocument().getLength());
     }
 
     public void printDebugLog(String s){
         DebugArea.append(s+"\n");
-        DebugArea.setCaretPosition(ServerArea.getDocument().getLength());
+        DebugArea.setCaretPosition(DebugArea.getDocument().getLength());
     }
 
     /**
