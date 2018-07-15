@@ -129,14 +129,16 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitConnect(String ip, String username) {
+        visitDisconnect();
         try {
-            broker.ConnectionRequest(ip, username);
+            if(broker.ConnectionRequest(ip, username)){
+                Uprompt=(username+"@"+ip);
+                usermode = !usermode;
+            }
         } catch (RemoteException e) {
             System.err.println("Cannot connect: "+e.getMessage());
             return null;
         }
-        Uprompt=(username+"@"+ip);
-        usermode = !usermode;
         return null;
     }
 
@@ -166,7 +168,9 @@ public class Eval implements Visitors<Value> {
     @Override
     public Value visitSubscribe(Ident Topic) {
         try {
-            broker.Subscribe(Topic.getName());
+            if(!broker.Subscribe(Topic.getName())){
+                System.err.println("You can't subscribe...");
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -187,7 +191,6 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitExit() {
-        if(broker.GetConnectonStatus()) return visitDisconnect();
         broker.shutdown();
         return null;
     }
