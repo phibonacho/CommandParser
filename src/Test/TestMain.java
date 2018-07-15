@@ -22,8 +22,8 @@ public class TestMain {
         });
         System.setErr(new PrintStream(System.err){
             public void println(String s) {
-                if (s.contains("ServerDebug")) lf.printServerLog(s.substring(s.indexOf("]:" + 1, s.length())));
-                else if (s.contains("ClientDebug")) lf.printClientLog(s.substring(s.indexOf("]:" + 1, s.length())));
+                if (s.contains("[ServerDebug]:")) lf.printServerLog(s.replace("[ServerDebug]:", ""));
+                else if (s.contains("[ClientDebug]:")) lf.printClientLog(s.replace("[ClientDebug]:", ""));
                 else super.println(s);
             }
         });

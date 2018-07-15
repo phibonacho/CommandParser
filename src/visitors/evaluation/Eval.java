@@ -6,6 +6,7 @@ import parser.ast.*;
 import visitors.Visitors;
 
 import java.net.UnknownHostException;
+import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -115,7 +116,7 @@ public class Eval implements Visitors<Value> {
     @Override
     public Value visitUnsubscribe(Ident Topic) {
         try {
-            broker.Unsubscribe(Topic.getName());
+            broker.SubscribeRequest(Topic.getName(), "disconnect");
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -129,8 +130,8 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitConnect(String ip, String username) {
-        visitDisconnect();
         try {
+            visitDisconnect();
             if(broker.ConnectionRequest(ip, username)){
                 Uprompt=(username+"@"+ip);
                 usermode = !usermode;
@@ -146,7 +147,7 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitDisconnect() {
-        broker.Disconnect();
+        broker.disconnect();
         return null;
     }
 
@@ -170,7 +171,7 @@ public class Eval implements Visitors<Value> {
     @Override
     public Value visitSubscribe(Ident Topic) {
         try {
-            if(!broker.Subscribe(Topic.getName())){
+            if(!broker.SubscribeRequest(Topic.getName(), "subscribe")){
                 System.err.println("You can't subscribe...");
             }
         } catch (RemoteException e) {
