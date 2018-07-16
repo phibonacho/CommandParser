@@ -6,7 +6,6 @@ import parser.ast.*;
 import visitors.Visitors;
 
 import java.net.UnknownHostException;
-import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.NoSuchElementException;
