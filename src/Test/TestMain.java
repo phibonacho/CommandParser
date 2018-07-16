@@ -30,7 +30,7 @@ public class TestMain {
         System.setOut(new PrintStream(System.out){
             public void println(String s){
                 if(s.contains("[Notification]:")) lf.printDebugLog(s.replace("[Notification]: ", ""));
-                else super.println();
+                else super.println(s);
             }
         });
         Eval eval = new Eval();
