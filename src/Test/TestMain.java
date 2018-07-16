@@ -22,6 +22,7 @@ public class TestMain {
         });
         System.setErr(new PrintStream(System.err){
             public void println(String s) {
+                if(s.contains("_NT_")) lf.printDebugLog(s);
                 if (s.contains("[ServerDebug]:")) lf.printServerLog(s.replace("[ServerDebug]:", ""));
                 else if (s.contains("[ClientDebug]:")) lf.printClientLog(s.replace("[ClientDebug]:", ""));
                 else super.println(s);

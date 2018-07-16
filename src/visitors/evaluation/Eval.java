@@ -56,14 +56,17 @@ public class Eval implements Visitors<Value> {
     public Value visitRemove(TokenType e, String l, Ident t) {
         switch (e){
             case MESSAGE:
-                broker.removeMessage(t.getName(), l);
+                if(broker.removeMessage(t.getName(), l))System.err.println(t.getName()+" has been removed");
+                else System.err.println("Impossible to remove "+t.getName());
                 break;
             case TOPIC:
-                broker.removeTopic(t.getName());
+                if(broker.removeTopic(t.getName()))System.err.println(t.getName()+" has been removed");
                 break;
             case USER:
                 if(usermode) System.err.println("Yopu can't delete user in User Mode...");
-                else broker.kickUser(l);
+                else{
+                    broker.kickUser(l);
+                }
                 break;
         }
         return null;
@@ -147,9 +150,10 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitDisconnect() {
-        Uprompt = null;
-        usermode = !usermode;
-        broker.disconnect();
+        if (broker.disconnect()){
+            Uprompt = null;
+            usermode = !usermode;
+        }
         return null;
     }
 

@@ -152,6 +152,11 @@ public class StreamParser implements Parser {
         tryNext();
         switch (found){
             default:
+                unexpectedTokenError();
+            case MESSAGE:
+                consume(IN);
+                return new ListStmt(found, parseIdent());
+            case USER:
                 return new ListStmt(found, parseIn());
             case TOPIC:
                 return new ListStmt(found, null);
