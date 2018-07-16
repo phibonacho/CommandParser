@@ -42,7 +42,7 @@ public class Eval implements Visitors<Value> {
         else{
             // publish message:
             try {
-                if(!broker.PublishRequest(m, t))System.err.println("You must be subscribe to "+t+" if you want to send messages.");
+                if(!broker.PublishRequest(m, t))System.err.println("[Notification]: You must be subscribe to "+t+" if you want to send messages.");
             } catch (RemoteException e) {
                 e.printStackTrace();
             } catch (NoSuchElementException nse){
