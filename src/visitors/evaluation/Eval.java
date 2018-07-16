@@ -10,6 +10,7 @@ import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutionException;
 
 public class Eval implements Visitors<Value> {
     private String Sprompt = System.getProperty("user.name");
@@ -65,7 +66,13 @@ public class Eval implements Visitors<Value> {
             case USER:
                 if(usermode) System.err.println("Yopu can't delete user in User Mode...");
                 else{
-                    broker.kickUser(l);
+                    try {
+                        broker.kickUser(l);
+                    } catch (ExecutionException e1) {
+                        e1.printStackTrace();
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
                 }
                 break;
         }
