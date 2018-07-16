@@ -22,10 +22,15 @@ public class TestMain {
         });
         System.setErr(new PrintStream(System.err){
             public void println(String s) {
-                if(s.contains("[Notification]:")) lf.printDebugLog(s.replace("[Notification]: ", ""));
-                else if (s.contains("[ServerDebug]:")) lf.printServerLog(s.replace("[ServerDebug]:", ""));
+                if (s.contains("[ServerDebug]:")) lf.printServerLog(s.replace("[ServerDebug]:", ""));
                 else if (s.contains("[ClientDebug]:")) lf.printClientLog(s.replace("[ClientDebug]:", ""));
                 else super.println(s);
+            }
+        });
+        System.setOut(new PrintStream(System.out){
+            public void println(String s){
+                if(s.contains("[Notification]:")) lf.printDebugLog(s.replace("[Notification]: ", ""));
+                else super.println();
             }
         });
         Eval eval = new Eval();
