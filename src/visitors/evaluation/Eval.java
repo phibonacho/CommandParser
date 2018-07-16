@@ -116,7 +116,7 @@ public class Eval implements Visitors<Value> {
     @Override
     public Value visitUnsubscribe(Ident Topic) {
         try {
-            broker.SubscribeRequest(Topic.getName(), "disconnect");
+            broker.SubscribeRequest(Topic.getName(), "unsubscribe");
         } catch (RemoteException e) {
             e.printStackTrace();
         }
