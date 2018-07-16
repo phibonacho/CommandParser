@@ -6,6 +6,7 @@ import parser.ast.*;
 import visitors.Visitors;
 
 import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -66,7 +67,7 @@ public class Eval implements Visitors<Value> {
                 if(usermode) System.err.println("Yopu can't delete user in User Mode...");
                 else{
                     try {
-                        broker.kickUser(l);
+                        broker.ManualkickUser(l);
                     } catch (ExecutionException e1) {
                         e1.printStackTrace();
                     } catch (InterruptedException e1) {
@@ -113,6 +114,8 @@ public class Eval implements Visitors<Value> {
                         toList = broker.getServerTopics().getTopicNamed(o.getName()).ListUsers();
                     } catch (NoSuchElementException e) {
                         System.err.println("No topic named <"+o.getName()+"> found..");
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
                     }
                 }
                 break;
@@ -207,7 +210,13 @@ public class Eval implements Visitors<Value> {
     @Override
     public Value visitExit() {
         visitDisconnect();
-        broker.shutdown();
+        try {
+            broker.shutDown();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
