@@ -215,6 +215,7 @@ public class Eval implements Visitors<Value> {
     @Override
     public Value visitStart(IP ip) {
         broker.start(ip.accept(this).toString());
+        if(usermode) usermode = !usermode;
         Sprompt= Sprompt+"@"+ip.getIp();
         return null;
     }
