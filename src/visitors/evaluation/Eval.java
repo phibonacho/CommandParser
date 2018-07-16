@@ -149,6 +149,7 @@ public class Eval implements Visitors<Value> {
                 Uprompt=(username+"@"+ip);
                 usermode = !usermode;
             }
+            else System.err.println("Connection failed");
         } catch (RemoteException e) {
             System.err.println("Cannot connect: "+e.getMessage());
             return null;
@@ -191,6 +192,9 @@ public class Eval implements Visitors<Value> {
             if(!broker.SubscribeRequest(Topic.getName(), "subscribe")){
                 System.err.println("You can't subscribe...");
             }
+            else{
+                System.err.println("Successfully Subscribed");
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -199,6 +203,35 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitHelp() {
+        System.err.println("sintassi comandi: \n"
+
+                + "start <IPaddress> \n"
+
+                + "connect <IPaddress> as <username> \n"
+
+                + "exit \n"
+
+                + "disconnect \n"
+
+                + "switchmode \n"
+
+                + "subscrive \n"
+
+                + "unsibscribe \n"
+
+                + "add \"<message>\" IN <nameTopic> \n"
+
+                + "add <nameTopic> \n"
+
+                + "remove <nameUser> \n"
+
+                + "remove <nameTopic> \n"
+
+                + "list message in <nameTopic> \n"
+
+                + "list user \n"
+
+                + "list topic \n");
         return null;
     }
 
