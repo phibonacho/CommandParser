@@ -145,6 +145,7 @@ public class Eval implements Visitors<Value> {
         try {
             visitDisconnect();
             if(broker.ConnectionRequest(ip, username)){
+                System.err.println("Connection successful");
                 Uprompt=(username+"@"+ip);
                 usermode = !usermode;
             }
@@ -159,7 +160,8 @@ public class Eval implements Visitors<Value> {
 
     @Override
     public Value visitDisconnect() {
-        if (broker.disconnect()){
+        if (broker.disconnect())
+        if(usermode) {
             Uprompt = null;
             usermode = !usermode;
         }
