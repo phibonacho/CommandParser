@@ -14,6 +14,10 @@ public class TestMain {
         final String ANSI_BLUE = "\u001B[34m";
         final String ANSI_RESET = "\u001B[0m";
         LogFrame lf = new LogFrame();
+        Eval eval = new Eval();
+        Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(System.in));
+        Parser parser = new StreamParser(tokenizer);
+        Stmt stmt;
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -30,13 +34,14 @@ public class TestMain {
         System.setOut(new PrintStream(System.out){
             public void println(String s){
                 if(s.contains("[Notification]:")) lf.printDebugLog(s.replace("[Notification]: ", ""));
+                else if(s.contains("[RemovedNotification]:")){
+                    super.println("\n"+s.replace("[RemovedNotification]: ", ""));
+                    eval.setMode(false);
+                    super.print(ANSI_BLUE+"["+eval.getPrompt()+"]> "+ANSI_RESET);
+                }
                 else super.println(s);
             }
         });
-        Eval eval = new Eval();
-        Stmt stmt;
-        Tokenizer tokenizer = new StreamTokenizer(new InputStreamReader(System.in));
-        Parser parser = new StreamParser(tokenizer);
             do {
                 try{
                     System.err.print(ANSI_BLUE+"["+eval.getPrompt()+"]> "+ANSI_RESET);

@@ -29,13 +29,14 @@ public class Eval implements Visitors<Value> {
     @Override
     public Value visitAdd(String m, String t) {
         // add topics:
-        if(!usermode){
+        if(!getMode()){
             System.err.println("You can't add topics in server mode...");
             return null;
         }
         if(m==null){
             try {
-                broker.AddTopicRequest(t);
+                if(broker.AddTopicRequest(t)) System.err.println("Successfully added");
+                else System.err.println("Cannot add topic, maybe you've been removed from remote?");
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -85,7 +86,7 @@ public class Eval implements Visitors<Value> {
         switch (t){
             case TOPIC:
                 try {
-                    if(!usermode) toList = broker.getTopics().ListTopicName();
+                    if(!getMode()) toList = broker.getTopics().ListTopicName();
                     else toList = broker.getServerTopics().ListTopicName();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -93,18 +94,18 @@ public class Eval implements Visitors<Value> {
                 break;
             case MESSAGE:
                 try {
-                    if(!usermode) toList = broker.getTopics().getTopicNamed(o.getName()).ListMessages();
+                    if(!getMode()) toList = broker.getTopics().getTopicNamed(o.getName()).ListMessages();
                     else toList = broker.getServerTopics().getTopicNamed(o.getName()).ListMessages();
                 } catch (RemoteException e) {
                     e.printStackTrace();
-                } catch (NoSuchElementException nse){
+                } catch (NullPointerException nse){
                     System.err.println("No topic named <"+o.getName()+"> found...");
                     return null;
                 }
                 break;
             case USER:
                 if(o == null)
-                    if(!usermode)toList = broker.getConnectedUsers();
+                    if(!getMode())toList = broker.getConnectedUsers();
                     else{
                         System.err.println("You can't list users in User Mode");
                         return null;
@@ -112,7 +113,7 @@ public class Eval implements Visitors<Value> {
                 else {
                     try {
                         toList = broker.getServerTopics().getTopicNamed(o.getName()).ListUsers();
-                    } catch (NoSuchElementException e) {
+                    } catch (NullPointerException e) {
                         System.err.println("No topic named <"+o.getName()+"> found..");
                     } catch (RemoteException e) {
                         e.printStackTrace();
@@ -120,8 +121,8 @@ public class Eval implements Visitors<Value> {
                 }
                 break;
         }
-        if(toList == null) System.out.println("No "+ t +" available");
-        else for(String it : toList) System.out.println(it);
+        if(toList == null) System.err.println("No "+ t +" available");
+        else for(String it : toList) System.err.println(it);
         return null;
     }
 
@@ -146,8 +147,10 @@ public class Eval implements Visitors<Value> {
             visitDisconnect();
             if(broker.ConnectionRequest(ip, username)){
                 System.err.println("Connection successful");
-                Uprompt=(username+"@"+ip);
-                usermode = !usermode;
+                if(!getMode()) {
+                    Uprompt = (username + "@" + ip);
+                    setMode(true);
+                }
             }
             else System.err.println("Connection failed");
         } catch (RemoteException e) {
@@ -162,9 +165,9 @@ public class Eval implements Visitors<Value> {
     @Override
     public Value visitDisconnect() {
         if (broker.disconnect())
-        if(usermode) {
+        if(getMode()) {
             Uprompt = null;
-            usermode = !usermode;
+            setMode(false);
         }
         return null;
     }
@@ -215,19 +218,21 @@ public class Eval implements Visitors<Value> {
 
                 + "switchmode \n"
 
-                + "subscrive \n"
+                + "subscribe <TopicLabel> \n"
 
-                + "unsibscribe \n"
+                + "unsibscribe <TopicLabel>\n"
 
-                + "add \"<message>\" IN <nameTopic> \n"
+                + "add message \"<message>\" in <nameTopic> \n"
 
-                + "add <nameTopic> \n"
+                + "add topic <nameTopic> \n"
 
-                + "remove <nameUser> \n"
+                + "remove user <nameUser> \n"
 
-                + "remove <nameTopic> \n"
+                + "remove topic <nameTopic> \n"
 
                 + "list message in <nameTopic> \n"
+
+                + "list user in <TopicLabel>"
 
                 + "list user \n"
 
@@ -258,7 +263,7 @@ public class Eval implements Visitors<Value> {
     @Override
     public Value visitStart(IP ip) {
         broker.start(ip.accept(this).toString());
-        if(usermode) usermode = !usermode;
+        if(getMode()) setMode(false);
         Sprompt= Sprompt+"@"+ip.getIp();
         return null;
     }
@@ -274,11 +279,19 @@ public class Eval implements Visitors<Value> {
             System.err.println("You must connect first in order to switch to user mode");
             return null;
         }
-        usermode = !usermode;
+        setMode(!getMode());
         return null;
     }
 
     public String getPrompt(){
-        return usermode?Uprompt:Sprompt;
+        return getMode()?Uprompt:Sprompt;
+    }
+
+    private boolean getMode(){
+        return usermode && broker.getConnectionStatus();
+    }
+
+    public void setMode(boolean m){
+        usermode = m;
     }
 }

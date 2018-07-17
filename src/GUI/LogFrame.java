@@ -116,7 +116,7 @@ public class LogFrame extends javax.swing.JFrame {
                         .addComponent(DebugScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
         );
 
-        TabPanel.addTab("Debug Log", DebugPanel);
+        TabPanel.addTab("Notification Log", DebugPanel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
